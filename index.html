@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f4f2ed" />
+    <meta
+      name="description"
+      content="Turn images into Ising animations. Arrange a sequence, explore transitions, and export GIFs or still figures. Everything runs in your browser."
+    />
+    <title>Ising Morph — images from fluctuations</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23242c28'/%3E%3Cpath d='M9 9h9v9H9zm13 0h9v9h-9zM9 22h9v9H9zm13 0h9v9h-9z' fill='%23e9b79d'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="./" class="brand" aria-label="Ising Morph home"
+        ><span class="brand-mark" aria-hidden="true"
+          ><i></i><i></i><i></i><i></i></span
+        >Ising <span>Morph</span></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#about">How it works</a
+        ><a href="https://drknwmn.github.io/portfolio/">Derek Newman ↗</a>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">A small experiment in order & disorder</p>
+          <h1>Images from<br /><em>fluctuations.</em></h1>
+        </div>
+        <div class="intro-copy">
+          <p>
+            Let a figure emerge from noise, dissolve, and become something else.
+          </p>
+          <p class="subtle">
+            Arrange your images. Play with the transitions. Take the animation
+            with you.
+          </p>
+          <span class="local-badge"
+            ><i aria-hidden="true"></i>On your device. No uploads, accounts, or
+            API keys.</span
+          >
+        </div>
+      </section>
+      <div class="studio">
+        <aside class="controls" aria-label="Animation controls">
+          <section class="panel images-panel">
+            <div class="panel-heading">
+              <h2><span>01</span> Your sequence</h2>
+              <span id="image-count" class="counter">0 / 8</span>
+            </div>
+            <label class="drop-zone" id="drop-zone" for="file-input"
+              ><span aria-hidden="true" class="upload-icon">＋</span
+              ><strong>Add your images</strong
+              ><span>Choose files or drop them here</span
+              ><small>PNG, JPG, WebP · up to 12 MB each</small></label
+            >
+            <input
+              id="file-input"
+              class="visually-hidden"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              multiple
+            />
+            <div
+              class="sequence"
+              id="sequence"
+              aria-label="Images in playback order"
+            ></div>
+            <div class="image-actions">
+              <button class="text-button" id="examples">
+                Load example shapes</button
+              ><button class="text-button" id="clear-images">Clear</button>
+            </div>
+            <p class="hint">
+              Use the arrows to reorder. Each image has its own inversion and
+              binary mask.
+            </p>
+          </section>
+          <section class="panel">
+            <div class="panel-heading">
+              <h2><span>02</span> The transition</h2>
+            </div>
+            <fieldset class="segmented">
+              <legend class="visually-hidden">Transition style</legend>
+              <label
+                ><input
+                  type="radio"
+                  name="mode"
+                  value="dissolve"
+                  checked
+                /><span>Dissolve & reform</span></label
+              ><label
+                ><input type="radio" name="mode" value="direct" /><span
+                  >Direct morph</span
+                ></label
+              >
+            </fieldset>
+            <p id="mode-description" class="hint">
+              Release each image into fluctuations before the next one forms.
+            </p>
+            <div class="range-field">
+              <label for="formation"
+                >Formation <output id="formation-value">2 s</output></label
+              ><input
+                id="formation"
+                data-config="formation"
+                type="range"
+                min="0.5"
+                max="5"
+                step="0.25"
+                value="2"
+              />
+            </div>
+            <div class="range-field">
+              <label for="hold"
+                >Hold each image <output id="hold-value">0.75 s</output></label
+              ><input
+                id="hold"
+                data-config="hold"
+                type="range"
+                min="0"
+                max="3"
+                step="0.25"
+                value="0.75"
+              />
+            </div>
+            <div class="range-field dissolve-setting">
+              <label for="dissolve"
+                >Dissolve <output id="dissolve-value">0.75 s</output></label
+              ><input
+                id="dissolve"
+                data-config="dissolve"
+                type="range"
+                min="0.25"
+                max="3"
+                step="0.25"
+                value="0.75"
+              />
+            </div>
+            <div class="range-field dissolve-setting">
+              <label for="gap"
+                >Fluctuations between images
+                <output id="gap-value">0.75 s</output></label
+              ><input
+                id="gap"
+                data-config="gap"
+                type="range"
+                min="0"
+                max="3"
+                step="0.25"
+                value="0.75"
+              />
+            </div>
+            <label class="check"
+              ><input type="checkbox" id="outro" checked />Return to noise at
+              the end</label
+            >
+            <details>
+              <summary>Image treatment & advanced controls</summary>
+              <div class="advanced">
+                <label class="select-field"
+                  >Image framing<select id="fit">
+                    <option value="contain">Fit whole image</option>
+                    <option value="cover">Crop to fill</option>
+                  </select></label
+                >
+                <label class="select-field"
+                  >Transparent areas<select id="background">
+                    <option value="black">Dark background</option>
+                    <option value="white">Light background</option>
+                  </select></label
+                >
+                <div class="range-field">
+                  <label for="threshold"
+                    >Binary mask threshold
+                    <output id="threshold-value">0.5</output></label
+                  ><input
+                    id="threshold"
+                    type="range"
+                    min="0.1"
+                    max="0.9"
+                    step="0.05"
+                    value="0.5"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="strength"
+                    >Image guidance
+                    <output id="strength-value">1.8</output></label
+                  ><input
+                    id="strength"
+                    data-config="strength"
+                    type="range"
+                    min="0.5"
+                    max="4"
+                    step="0.1"
+                    value="1.8"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="sweeps"
+                    >Dynamics per frame
+                    <output id="sweeps-value">3</output></label
+                  ><input
+                    id="sweeps"
+                    data-config="sweeps"
+                    type="range"
+                    min="1"
+                    max="12"
+                    step="1"
+                    value="3"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="noise"
+                    >Noise at start / end
+                    <output id="noise-value">0.6 s</output></label
+                  ><input
+                    id="noise"
+                    data-config="noise"
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="0.1"
+                    value="0.6"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="hot"
+                    >Disorder temperature
+                    <output id="hot-value">3.5</output></label
+                  ><input
+                    id="hot"
+                    data-config="hot"
+                    type="range"
+                    min="2.5"
+                    max="5"
+                    step="0.1"
+                    value="3.5"
+                  />
+                </div>
+                <label class="select-field"
+                  >Random seed<input
+                    id="seed"
+                    type="number"
+                    min="0"
+                    max="4294967295"
+                    step="1"
+                    value="7"
+                /></label>
+                <p class="hint">
+                  The same images, settings, and seed reproduce the same
+                  simulation in this app version.
+                </p>
+              </div>
+            </details>
+          </section>
+          <section class="panel">
+            <div class="panel-heading">
+              <h2><span>03</span> Make it yours</h2>
+            </div>
+            <div class="field-grid">
+              <label class="select-field"
+                >Simulation grid<select id="size">
+                  <option value="64">64 × 64 · quick</option>
+                  <option value="128" selected>128 × 128 · balanced</option>
+                  <option value="192">192 × 192 · detailed</option>
+                  <option value="256">256 × 256 · fine</option>
+                </select></label
+              ><label class="select-field"
+                >GIF scale<select id="scale">
+                  <option value="1">1× · native</option>
+                  <option value="2" selected>2× · crisp pixels</option>
+                  <option value="4">4× · larger</option>
+                </select></label
+              >
+            </div>
+            <div class="field-grid">
+              <label class="select-field"
+                >Frames per second<select id="fps">
+                  <option value="10">10 fps</option>
+                  <option value="15">15 fps</option>
+                  <option value="20" selected>20 fps</option>
+                  <option value="24">24 fps</option>
+                  <option value="30">30 fps</option>
+                </select></label
+              ><label class="select-field"
+                >GIF playback<select id="loop">
+                  <option value="yes">Repeat</option>
+                  <option value="no">Play once</option>
+                </select></label
+              >
+            </div>
+            <p class="estimate" id="estimate"></p>
+            <button class="primary-button" id="generate">
+              Generate animation <span aria-hidden="true">↗</span></button
+            ><button class="cancel-button" id="cancel" hidden>
+              Cancel generation
+            </button>
+            <div class="generation-status" id="generation-status" hidden>
+              <progress
+                id="progress"
+                max="100"
+                value="0"
+                aria-label="Generation progress"
+              ></progress>
+              <p id="progress-text" role="status" aria-live="polite"></p>
+            </div>
+            <p
+              id="message"
+              class="message"
+              role="status"
+              aria-live="polite"
+            ></p>
+            <button class="text-button" id="reset">
+              Reset animation settings
+            </button>
+          </section>
+        </aside>
+        <section class="preview-column" aria-label="Animation preview">
+          <div class="preview-sticky">
+            <div class="preview-heading">
+              <p class="eyebrow">The canvas</p>
+              <span id="preview-state" class="preview-state"
+                >Ready to explore</span
+              >
+            </div>
+            <div class="canvas-shell">
+              <canvas
+                id="canvas"
+                width="128"
+                height="128"
+                role="img"
+                aria-label="Preview of the Ising lattice"
+              ></canvas>
+              <div class="canvas-caption">
+                <span id="frame-label"
+                  >Your first image, waiting to emerge.</span
+                ><span id="dimensions">128² lattice</span>
+              </div>
+            </div>
+            <div class="playback">
+              <button id="play" aria-label="Play animation" disabled>▶</button
+              ><input
+                id="scrub"
+                type="range"
+                min="0"
+                max="0"
+                value="0"
+                step="1"
+                aria-label="Animation frame"
+                disabled
+              /><span id="timecode">0:00 / 0:00</span>
+            </div>
+            <div class="result-bar">
+              <div>
+                <strong id="result-title"
+                  >Start with a little curiosity.</strong
+                >
+                <p id="result-description">
+                  The example sequence is ready. Adjust anything, then generate.
+                </p>
+              </div>
+              <div class="export-actions">
+                <a id="download-gif" class="download-button" hidden
+                  >Download GIF ↓</a
+                ><button id="download-png" class="secondary-button" disabled>
+                  Save still PNG
+                </button>
+              </div>
+            </div>
+            <div class="recipe-bar">
+              <button id="save-settings" class="text-button">
+                Save settings ↓</button
+              ><label class="text-button" for="load-settings"
+                >Load settings ↑</label
+              ><input
+                id="load-settings"
+                class="visually-hidden"
+                type="file"
+                accept="application/json,.json"
+              /><span id="stale-note" hidden
+                >Settings changed · generate to apply</span
+              >
+            </div>
+            <p class="preview-note">
+              GIF scale enlarges the pixels; grid size adds simulation detail.
+              Still images export at 1024 × 1024 pixels.
+            </p>
+          </div>
+        </section>
+      </div>
+      <section id="about" class="about">
+        <p class="eyebrow">Behind the fluctuations</p>
+        <div class="about-grid">
+          <h2>A field of tiny choices.<br />A figure finding its form.</h2>
+          <div>
+            <p>
+              Each pixel is a spin in a two-dimensional Ising lattice.
+              Neighboring spins prefer to agree; temperature lets them change.
+              Your image becomes a spatial field that gently guides those
+              choices.
+            </p>
+            <p>
+              In <strong>Dissolve & reform</strong>, that guidance fades between
+              images. In <strong>Direct morph</strong>, the guiding field shifts
+              from one image to the next. Try silhouettes, bold diagrams, or
+              high-contrast figures.
+            </p>
+            <p class="hint">
+              This is an image-guided visualization using Metropolis dynamics
+              and periodic boundaries. The zero-field critical temperature is a
+              reference for the model, not evidence that an image transition is
+              a thermodynamic phase transition. Simulation steps are not
+              physical time.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>Ising Morph · by Derek Newman</span>
+      <div>
+        <a href="https://github.com/drknwmn/IsingMorph"
+          >Source & documentation ↗</a
+        ><a href="https://drknwmn.github.io/portfolio/">Portfolio ↗</a>
+      </div>
+      <small
+        >Your images stay in this browser tab. Closing or reloading clears
+        them.</small
+      >
+    </footer>
+  </body>
+</html>

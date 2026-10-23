@@ -1,0 +1,19 @@
+{
+  "name": "ising-morph",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Make image sequences emerge, dissolve, and transform through an Ising lattice. Runs locally in your browser.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build --base=./",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "gifenc": "1.0.3"
+  },
+  "devDependencies": {
+    "vite": "6.4.5"
+  }
+}
