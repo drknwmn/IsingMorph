@@ -1,4 +1,4 @@
-export const VERSION = "1.0.0";
+export const VERSION = "1.0.1";
 export const DEFAULTS = Object.freeze({
   size: 128,
   fps: 20,
@@ -19,7 +19,7 @@ export const DEFAULTS = Object.freeze({
 export function randomGenerator(seed) {
   let state = seed >>> 0;
   return () => {
-    state += 0x6d2b79f5;
+    state = (state + 0x6d2b79f5) >>> 0;
     let t = state;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -50,6 +50,8 @@ export function validateConfig(input) {
   for (const key of ["size", "fps", "sweeps", "seed", "scale"])
     if (!Number.isInteger(c[key]))
       throw new Error(`${key} must be an integer.`);
+  if (![64, 128, 192, 256].includes(c.size) || ![1, 2, 4].includes(c.scale) || ![10, 15, 20, 24, 30].includes(c.fps))
+    throw new Error("Choose a supported grid size, GIF scale, and frame rate.");
   if (!["dissolve", "direct"].includes(c.mode))
     throw new Error("Choose a valid transition style.");
   if (typeof c.outro !== "boolean" || typeof c.loop !== "boolean")

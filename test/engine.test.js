@@ -26,6 +26,14 @@ test("a seed reproduces the actual trajectory, not just initialization", () => {
   assert.ok(a.spins.every((s) => s === -1 || s === 1));
   assert.notEqual(randomGenerator(0)(), randomGenerator(1)());
 });
+
+test("long runs preserve the 32-bit random sequence", () => {
+  const random = randomGenerator(7);
+  let value;
+  for (let i = 0; i < 6000000; i++) value = random();
+  // Independent unsigned-integer reference at this position in the stream.
+  assert.equal(value, 0.6412742617540061);
+});
 test("local flip energies match the independent total-energy calculation including wrapped edges", () => {
   const m = new IsingModel(7, 7),
     H = Float32Array.from({ length: 49 }, (_, i) => ((i % 5) - 2) * 0.3);
