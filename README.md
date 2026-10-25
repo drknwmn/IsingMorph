@@ -12,6 +12,9 @@ images, explore two transition styles, and save a GIF or a still PNG.
    image border; adjust **Invert** and **Binary mask** per image as needed.
 3. Pick **Dissolve & reform** or **Direct morph**, then adjust formation, hold,
    dissolve, and fluctuation times in seconds.
+   **Original flow**, the default, uses a 180 × 180 lattice, 24 fps, two sweeps
+   per frame, and longer field-free intervals based on the original animation.
+   **Quick preview** uses a smaller lattice and shorter timings.
 4. Generate. The simulation and GIF encoding run in a dedicated browser worker.
    You can cancel a job immediately. Lower grid sizes are faster.
 5. Play or scrub the result. Download the GIF, or export the selected frame as
@@ -52,6 +55,14 @@ finite-size, nonequilibrium visualizations. The zero-field critical temperature
 2 / ln(1 + sqrt(2)) ≈ 2.269 is a reference; a nonzero image field is not a
 demonstration of the zero-field thermodynamic phase transition. Animation
 seconds and simulation sweeps are not physical time.
+
+Original flow restores the original lattice resolution and approximately the
+same number of sweeps in each phase, with a short image hold for readability.
+Field strength uses eased ramps; temperature uses linear ramps. The initial
+and final field-free intervals allow clusters to develop before an image
+forms and before the lattice reheats. The random generator and browser image
+resampling differ from the original Python notebook, so this matches its
+visual timing and texture rather than reproducing its exact pixels.
 
 GIF timing uses cumulative centisecond rounding. Some viewers may clamp short
 frame delays. Looping repeats the saved sequence; it does not guarantee an

@@ -1,4 +1,10 @@
-import { DEFAULTS, VERSION, validateConfig, schedule } from "./engine.js";
+import {
+  DEFAULTS,
+  PRESETS,
+  VERSION,
+  validateConfig,
+  schedule,
+} from "./engine.js";
 
 const $ = (id) => document.getElementById(id);
 const state = {
@@ -18,7 +24,16 @@ const state = {
 };
 const canvas = $("canvas"),
   ctx = canvas.getContext("2d", { alpha: false });
-const durationKeys = new Set(["formation", "hold", "dissolve", "gap", "noise"]);
+const durationKeys = new Set([
+  "formation",
+  "hold",
+  "dissolve",
+  "gap",
+  "noise",
+  "intro",
+  "settle",
+  "reheat",
+]);
 const clock = (t) =>
   `${Math.floor(t / 60)}:${Math.floor(t % 60)
     .toString()
@@ -329,8 +344,15 @@ function syncControls() {
   for (const el of document.querySelectorAll("[data-config]")) {
     const key = el.dataset.config;
     $(key + "-value").textContent =
-      `${state.config[key]}${durationKeys.has(key) ? " s" : ""}`;
+      `${Number(state.config[key].toFixed(3))}${durationKeys.has(key) ? " s" : ""}`;
   }
+  const motionKeys = Object.keys(DEFAULTS).filter(
+    (key) => !["seed", "scale", "loop"].includes(key),
+  );
+  $("motion-preset").value =
+    Object.entries(PRESETS).find(([, preset]) =>
+      motionKeys.every((key) => preset[key] === state.config[key]),
+    )?.[0] || "custom";
   $("fit").value = state.fit;
   $("background").value = state.background;
   $("threshold").value = state.threshold;
@@ -500,7 +522,11 @@ function generate() {
         const firstHold = data.labels.findIndex(
           (label) => label === "Holding image 1",
         );
-        showFrame(Math.max(0, firstHold));
+        const firstImage =
+          firstHold >= 0
+            ? firstHold
+            : data.labels.lastIndexOf("Forming image 1");
+        showFrame(Math.max(0, firstImage));
       }
     };
     worker.postMessage(
@@ -652,6 +678,19 @@ for (const event of ["dragleave", "drop"])
   });
 $("drop-zone").addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
 $("examples").addEventListener("click", loadExamples);
+$("motion-preset").addEventListener("change", () => {
+  const preset = PRESETS[$("motion-preset").value];
+  if (!preset || state.busy) return;
+  state.config = {
+    ...preset,
+    seed: state.config.seed,
+    scale: state.config.scale,
+    loop: state.config.loop,
+  };
+  syncControls();
+  renderImages();
+  markDirty();
+});
 $("clear-images").addEventListener("click", () => {
   if (state.busy) return;
   state.images.forEach((i) => URL.revokeObjectURL(i.url));

@@ -25,28 +25,16 @@
       >
       <nav aria-label="Main navigation">
         <a href="#about">How it works</a
-        ><a href="https://drknwmn.github.io/portfolio/">Derek Newman ↗</a>
+        ><a href="https://drknwmn.github.io/portfolio/">Portfolio ↗</a>
       </nav>
     </header>
     <main>
       <section class="intro">
-        <div>
-          <p class="eyebrow">A small experiment in order & disorder</p>
-          <h1>Images from<br /><em>fluctuations.</em></h1>
-        </div>
-        <div class="intro-copy">
-          <p>
-            Let a figure emerge from noise, dissolve, and become something else.
-          </p>
-          <p class="subtle">
-            Arrange your images. Play with the transitions. Take the animation
-            with you.
-          </p>
-          <span class="local-badge"
-            ><i aria-hidden="true"></i>On your device. No uploads, accounts, or
-            API keys.</span
-          >
-        </div>
+        <h1>Image transitions.</h1>
+        <p>Arrange. Tune. Export.</p>
+        <span class="local-badge"
+          ><i aria-hidden="true"></i>Runs on your device</span
+        >
       </section>
       <div class="studio">
         <aside class="controls" aria-label="Animation controls">
@@ -87,6 +75,15 @@
             <div class="panel-heading">
               <h2><span>02</span> The transition</h2>
             </div>
+            <label class="select-field preset-field"
+              >Motion preset<select id="motion-preset">
+                <option value="original" selected>
+                  Original flow · finer detail
+                </option>
+                <option value="quick">Quick preview</option>
+                <option value="custom" disabled>Custom</option>
+              </select></label
+            >
             <fieldset class="segmented">
               <legend class="visually-hidden">Transition style</legend>
               <label
@@ -107,28 +104,28 @@
             </p>
             <div class="range-field">
               <label for="formation"
-                >Formation <output id="formation-value">2 s</output></label
+                >Formation <output id="formation-value">3.125 s</output></label
               ><input
                 id="formation"
                 data-config="formation"
                 type="range"
                 min="0.5"
                 max="5"
-                step="0.25"
-                value="2"
+                step="0.125"
+                value="3.125"
               />
             </div>
             <div class="range-field">
               <label for="hold"
-                >Hold each image <output id="hold-value">0.75 s</output></label
+                >Hold each image <output id="hold-value">0.375 s</output></label
               ><input
                 id="hold"
                 data-config="hold"
                 type="range"
                 min="0"
                 max="3"
-                step="0.25"
-                value="0.75"
+                step="0.125"
+                value="0.375"
               />
             </div>
             <div class="range-field dissolve-setting">
@@ -147,7 +144,7 @@
             <div class="range-field dissolve-setting">
               <label for="gap"
                 >Fluctuations between images
-                <output id="gap-value">0.75 s</output></label
+                <output id="gap-value">1.25 s</output></label
               ><input
                 id="gap"
                 data-config="gap"
@@ -155,7 +152,7 @@
                 min="0"
                 max="3"
                 step="0.25"
-                value="0.75"
+                value="1.25"
               />
             </div>
             <label class="check"
@@ -204,10 +201,14 @@
                     value="1.8"
                   />
                 </div>
+                <p class="hint">
+                  Fine lines? Try a larger grid, stronger guidance, or a binary
+                  mask.
+                </p>
                 <div class="range-field">
                   <label for="sweeps"
                     >Dynamics per frame
-                    <output id="sweeps-value">3</output></label
+                    <output id="sweeps-value">2</output></label
                   ><input
                     id="sweeps"
                     data-config="sweeps"
@@ -215,21 +216,63 @@
                     min="1"
                     max="12"
                     step="1"
-                    value="3"
+                    value="2"
                   />
                 </div>
                 <div class="range-field">
                   <label for="noise"
                     >Noise at start / end
-                    <output id="noise-value">0.6 s</output></label
+                    <output id="noise-value">1.25 s</output></label
                   ><input
                     id="noise"
                     data-config="noise"
                     type="range"
                     min="0"
                     max="2"
-                    step="0.1"
-                    value="0.6"
+                    step="0.05"
+                    value="1.25"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="intro"
+                    >Initial fluctuations
+                    <output id="intro-value">1.05 s</output></label
+                  ><input
+                    id="intro"
+                    data-config="intro"
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="0.05"
+                    value="1.05"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="settle"
+                    >Final fluctuations
+                    <output id="settle-value">1.45 s</output></label
+                  ><input
+                    id="settle"
+                    data-config="settle"
+                    type="range"
+                    min="0"
+                    max="3"
+                    step="0.05"
+                    value="1.45"
+                  />
+                </div>
+                <div class="range-field">
+                  <label for="reheat"
+                    >Return to disorder
+                    <output id="reheat-value">0.95 s</output></label
+                  ><input
+                    id="reheat"
+                    data-config="reheat"
+                    type="range"
+                    min="0.1"
+                    max="2"
+                    step="0.05"
+                    value="0.95"
                   />
                 </div>
                 <div class="range-field">
@@ -270,7 +313,8 @@
               <label class="select-field"
                 >Simulation grid<select id="size">
                   <option value="64">64 × 64 · quick</option>
-                  <option value="128" selected>128 × 128 · balanced</option>
+                  <option value="128">128 × 128 · balanced</option>
+                  <option value="180" selected>180 × 180 · original</option>
                   <option value="192">192 × 192 · detailed</option>
                   <option value="256">256 × 256 · fine</option>
                 </select></label
@@ -287,8 +331,8 @@
                 >Frames per second<select id="fps">
                   <option value="10">10 fps</option>
                   <option value="15">15 fps</option>
-                  <option value="20" selected>20 fps</option>
-                  <option value="24">24 fps</option>
+                  <option value="20">20 fps</option>
+                  <option value="24" selected>24 fps</option>
                   <option value="30">30 fps</option>
                 </select></label
               ><label class="select-field"
@@ -298,12 +342,29 @@
                 </select></label
               >
             </div>
-            <p class="estimate" id="estimate"></p>
-            <button class="primary-button" id="generate">
-              Generate animation <span aria-hidden="true">↗</span></button
-            ><button class="cancel-button" id="cancel" hidden>
-              Cancel generation
+            <button class="text-button" id="reset">
+              Reset animation settings
             </button>
+          </section>
+        </aside>
+        <section class="preview-column" aria-label="Animation preview">
+          <div class="preview-sticky">
+            <div class="preview-heading">
+              <div class="preview-title">
+                <p class="eyebrow">The canvas</p>
+                <span id="preview-state" class="preview-state"
+                  >Ready to explore</span
+                >
+              </div>
+              <div class="run-actions">
+                <button class="primary-button" id="generate">
+                  Generate animation <span aria-hidden="true">↗</span></button
+                ><button class="cancel-button" id="cancel" hidden>
+                  Cancel generation
+                </button>
+              </div>
+            </div>
+            <p class="estimate" id="estimate"></p>
             <div class="generation-status" id="generation-status" hidden>
               <progress
                 id="progress"
@@ -319,19 +380,6 @@
               role="status"
               aria-live="polite"
             ></p>
-            <button class="text-button" id="reset">
-              Reset animation settings
-            </button>
-          </section>
-        </aside>
-        <section class="preview-column" aria-label="Animation preview">
-          <div class="preview-sticky">
-            <div class="preview-heading">
-              <p class="eyebrow">The canvas</p>
-              <span id="preview-state" class="preview-state"
-                >Ready to explore</span
-              >
-            </div>
             <div class="canvas-shell">
               <canvas
                 id="canvas"

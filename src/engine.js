@@ -1,20 +1,39 @@
-export const VERSION = "1.0.1";
+export const VERSION = "1.1.0";
 export const DEFAULTS = Object.freeze({
-  size: 128,
-  fps: 20,
-  sweeps: 3,
+  size: 180,
+  fps: 24,
+  sweeps: 2,
   seed: 7,
   strength: 1.8,
   hot: 3.5,
-  formation: 2,
-  hold: 0.75,
+  formation: 3.125,
+  hold: 0.375,
   dissolve: 0.75,
-  gap: 0.75,
-  noise: 0.6,
+  gap: 1.25,
+  noise: 1.25,
+  intro: 1.05,
+  settle: 1.45,
+  reheat: 0.95,
   mode: "dissolve",
   outro: true,
   scale: 2,
   loop: true,
+});
+export const PRESETS = Object.freeze({
+  original: DEFAULTS,
+  quick: Object.freeze({
+    ...DEFAULTS,
+    size: 128,
+    fps: 20,
+    sweeps: 3,
+    formation: 2,
+    hold: 0.75,
+    gap: 0.75,
+    noise: 0.6,
+    intro: 0.5,
+    settle: 0.75,
+    reheat: 0.5,
+  }),
 });
 export function randomGenerator(seed) {
   let state = seed >>> 0;
@@ -41,6 +60,9 @@ export function validateConfig(input) {
     dissolve: [0.25, 3],
     gap: [0, 3],
     noise: [0, 2],
+    intro: [0, 3],
+    settle: [0, 3],
+    reheat: [0.1, 2],
     scale: [1, 4],
   };
   for (const [key, [min, max]] of Object.entries(ranges)) {
@@ -50,7 +72,11 @@ export function validateConfig(input) {
   for (const key of ["size", "fps", "sweeps", "seed", "scale"])
     if (!Number.isInteger(c[key]))
       throw new Error(`${key} must be an integer.`);
-  if (![64, 128, 192, 256].includes(c.size) || ![1, 2, 4].includes(c.scale) || ![10, 15, 20, 24, 30].includes(c.fps))
+  if (
+    ![64, 128, 180, 192, 256].includes(c.size) ||
+    ![1, 2, 4].includes(c.scale) ||
+    ![10, 15, 20, 24, 30].includes(c.fps)
+  )
     throw new Error("Choose a supported grid size, GIF scale, and frame rate.");
   if (!["dissolve", "direct"].includes(c.mode))
     throw new Error("Choose a valid transition style.");
@@ -66,20 +92,22 @@ export function schedule(config, count) {
   const segment = (label, seconds, from, to, h0, h1, t0, t1) => {
     const n = Math.round(seconds * c.fps);
     for (let i = 0; i < n; i++) {
-      const t = ease((i + 1) / n);
+      const linear = (i + 1) / n;
+      const t = ease(linear);
       result.push({
         label,
         from,
         to,
         mix: t,
         h: h0 + (h1 - h0) * t,
-        T: t0 + (t1 - t0) * t,
+        T: t0 + (t1 - t0) * linear,
       });
     }
   };
   const tc = 2.269185314;
   segment("Disorder", c.noise, -1, -1, 0, 0, c.hot, c.hot);
-  segment("Approaching order", 0.5, -1, -1, 0, 0, c.hot, tc);
+  // Give clusters time to develop at the reference temperature before guiding them.
+  segment("Critical fluctuations", c.intro, -1, -1, 0, 0, tc, tc);
   segment(
     "Forming image 1",
     c.formation,
@@ -139,17 +167,19 @@ export function schedule(config, count) {
     }
   }
   if (c.outro) {
+    // The original loop releases its final image a little more slowly.
     segment(
       "Releasing the final image",
-      c.dissolve,
+      c.dissolve * 1.25,
       count - 1,
       count - 1,
       c.strength,
       0,
       tc * 0.98,
-      tc,
+      tc * 1.02,
     );
-    segment("Returning to disorder", 0.5, -1, -1, 0, 0, tc, c.hot);
+    segment("Final fluctuations", c.settle, -1, -1, 0, 0, tc, tc);
+    segment("Returning to disorder", c.reheat, -1, -1, 0, 0, tc, c.hot);
     segment("Disorder", c.noise, -1, -1, 0, 0, c.hot, c.hot);
   }
   if (result.length * c.size * c.size > 64 * 1024 * 1024)

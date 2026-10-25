@@ -104,10 +104,10 @@ main,
 footer {
   max-width: 1440px;
   margin: auto;
-  padding-inline: 56px;
+  padding-inline: 32px;
 }
 .site-header {
-  height: 92px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -151,11 +151,15 @@ footer a:hover {
   color: var(--accent);
 }
 .intro {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  padding-block: 50px 48px;
+  display: flex;
   align-items: center;
+  gap: 16px;
+  padding-block: 22px;
+}
+.intro p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 .eyebrow {
   font:
@@ -168,34 +172,15 @@ footer a:hover {
   margin: 0 0 16px;
 }
 h1 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(48px, 5.4vw, 76px);
-  line-height: 1.02;
-  letter-spacing: -3px;
-  font-weight: 400;
+  font-family: inherit;
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.7px;
   margin: 0;
 }
-h1 em {
-  font-weight: 400;
-  color: var(--accent);
-}
-.intro-copy {
-  max-width: 440px;
-  padding-top: 22px;
-}
-.intro-copy > p:first-child {
-  font-size: 21px;
-  line-height: 1.5;
-  letter-spacing: -0.4px;
-  margin: 0 0 12px;
-}
-.intro-copy .subtle {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.8;
-  margin: 0 0 22px;
-}
 .local-badge {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -210,8 +195,8 @@ h1 em {
 }
 .studio {
   display: grid;
-  grid-template-columns: 350px minmax(0, 1fr);
-  gap: 36px;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 24px;
   align-items: start;
 }
 .controls {
@@ -220,15 +205,15 @@ h1 em {
 }
 .panel {
   background: var(--panel);
-  padding: 24px;
+  padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 .panel-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .panel-heading h2 {
   font-size: 14px;
@@ -253,15 +238,21 @@ h1 em {
 }
 .drop-zone {
   border: 1px dashed #bfc6ba;
-  border-radius: 7px;
-  padding: 18px 10px;
-  display: flex;
+  border-radius: 6px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 24px 1fr;
   align-items: center;
-  flex-direction: column;
   cursor: pointer;
   background: #f4f5ee;
-  gap: 5px;
-  text-align: center;
+  gap: 3px 8px;
+  text-align: left;
+}
+.drop-zone .upload-icon {
+  grid-row: 1 / 4;
+}
+.drop-zone > :not(.upload-icon) {
+  grid-column: 2;
 }
 .drop-zone:hover,
 .drop-zone.is-over {
@@ -537,7 +528,7 @@ progress {
 }
 .preview-sticky {
   position: sticky;
-  top: 24px;
+  top: 16px;
 }
 .preview-column {
   align-self: stretch;
@@ -560,7 +551,7 @@ progress {
   color: var(--muted);
 }
 .canvas-shell {
-  padding: 28px 28px 0;
+  padding: 16px 16px 0;
   background: #171c19;
   border-radius: 10px;
   border: 1px solid #202a23;
@@ -573,7 +564,7 @@ progress {
   image-rendering: pixelated;
   object-fit: contain;
   background: black;
-  max-height: 65vh;
+  max-height: clamp(250px, calc(100dvh - 360px), 560px);
 }
 .canvas-caption {
   display: flex;
@@ -584,7 +575,7 @@ progress {
     9px/1.6 ui-monospace,
     SFMono-Regular,
     monospace;
-  padding: 16px 0;
+  padding: 10px 0;
 }
 .canvas-caption span:last-child {
   white-space: nowrap;
@@ -593,7 +584,7 @@ progress {
   display: flex;
   gap: 12px;
   align-items: center;
-  padding: 16px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--line);
 }
 .playback button {
@@ -622,7 +613,7 @@ progress {
   justify-content: space-between;
   gap: 20px;
   align-items: center;
-  padding: 22px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--line);
 }
 .result-bar strong {
@@ -638,7 +629,7 @@ progress {
 }
 .export-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
   flex-shrink: 0;
 }
@@ -792,7 +783,7 @@ body.is-busy .controls {
     padding-inline: 20px;
   }
   .site-header {
-    height: 72px;
+    height: 56px;
   }
   nav {
     gap: 16px;
@@ -802,32 +793,20 @@ body.is-busy .controls {
     font-size: 18px;
   }
   .intro {
-    padding-block: 32px;
-    grid-template-columns: 1fr;
-    gap: 18px;
+    padding-block: 16px;
+    gap: 5px 12px;
+    flex-wrap: wrap;
   }
   h1 {
-    font-size: 54px;
-    letter-spacing: -2px;
+    font-size: 20px;
+    letter-spacing: -0.5px;
   }
-  h1 br {
-    display: none;
-  }
-  h1 em {
-    white-space: nowrap;
-  }
-  .intro-copy {
-    padding: 0;
-    max-width: 100%;
-  }
-  .intro-copy > p:first-child {
-    font-size: 18px;
-    max-width: 38ch;
-  }
-  .intro-copy .subtle {
-    margin-bottom: 14px;
+  .intro p {
+    font-size: 10px;
   }
   .local-badge {
+    width: 100%;
+    margin-left: 0;
     font-size: 9px;
   }
   .studio {
@@ -940,14 +919,58 @@ body.is-busy .controls {
     scroll-behavior: auto;
   }
 }
-.intro > div {
-  min-width: 0;
+
+.preset-field {
+  margin: 0 0 14px;
+}
+.preview-title {
+  display: grid;
+  gap: 4px;
+}
+.run-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.run-actions .primary-button,
+.run-actions .cancel-button {
+  width: auto;
+  margin: 0;
+  padding: 11px 14px;
+  gap: 18px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.preview-column .estimate {
+  margin: 0 0 12px;
+}
+.preview-column .generation-status {
+  margin: 0 0 12px;
+}
+.preview-column .message {
+  margin-bottom: 12px;
 }
 @media (max-width: 760px) {
-  h1 br {
-    display: block;
+  .preview-heading {
+    gap: 12px;
   }
-  h1 {
-    font-size: clamp(44px, 12vw, 54px);
+  .preview-state {
+    font-size: 9px;
+  }
+  .preview-heading .eyebrow {
+    font-size: 9px;
+  }
+  .export-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .result-bar {
+    flex-wrap: wrap;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .drop-zone {
+    padding: 12px;
   }
 }

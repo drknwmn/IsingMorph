@@ -5,6 +5,7 @@ import gifenc from "gifenc";
 const { GIFEncoder } = gifenc;
 import {
   DEFAULTS,
+  PRESETS,
   randomGenerator,
   IsingModel,
   validateConfig,
@@ -81,7 +82,7 @@ test("dissolve and direct modes have distinct schedules with all image holds", (
   for (let i = 1; i <= 3; i++)
     assert.equal(
       dissolve.filter((p) => p.label === `Holding image ${i}`).length,
-      15,
+      9,
     );
   assert.ok(
     !schedule({ ...DEFAULTS, outro: false }, 1).some(
@@ -89,6 +90,32 @@ test("dissolve and direct modes have distinct schedules with all image holds", (
     ),
   );
   assert.ok(dissolve.every((p) => Number.isFinite(p.T) && p.T > 0 && p.h >= 0));
+});
+test("original-flow preset restores the reference lattice and fluctuation time", () => {
+  const plan = schedule(PRESETS.original, 3);
+  assert.equal(DEFAULTS.size, 180);
+  assert.equal(DEFAULTS.sweeps, 2);
+  assert.equal(plan.length, 514);
+  assert.equal(
+    plan.filter((p) => p.label === "Critical fluctuations").length *
+      DEFAULTS.sweeps,
+    50,
+  );
+  assert.equal(
+    plan.filter((p) => p.label === "Forming image 1").length * DEFAULTS.sweeps,
+    150,
+  );
+  assert.equal(
+    plan.filter((p) => p.label === "Final fluctuations").length *
+      DEFAULTS.sweeps,
+    70,
+  );
+  assert.ok(
+    plan
+      .filter((p) => p.label === "Critical fluctuations")
+      .every((p) => p.h === 0 && Math.abs(p.T - 2.269185314) < 1e-8),
+  );
+  assert.ok(schedule(PRESETS.quick, 3).length < plan.length);
 });
 test("field interpolation is the actual blend, and zero guidance is field-free", () => {
   const a = new Float32Array([-1, 1]),
