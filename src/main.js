@@ -13,6 +13,7 @@ const state = {
   result: null,
   worker: null,
   busy: false,
+  loadingImages: false,
   playing: false,
   frame: 0,
   raf: 0,
@@ -125,7 +126,8 @@ function updateEstimate() {
       width = state.config.size * state.config.scale;
     $("estimate").textContent =
       `${(plan.length / state.config.fps).toFixed(1)} s · ${plan.length} frames · ${width} × ${width} GIF`;
-    $("generate").disabled = state.busy || !state.images.length;
+    $("generate").disabled =
+      state.busy || state.loadingImages || !state.images.length;
   } catch (e) {
     $("estimate").textContent = e.message;
     $("generate").disabled = true;
@@ -148,7 +150,7 @@ function imageRow(image, index) {
       input = node("input");
     input.type = "checkbox";
     input.checked = image[key];
-    input.disabled = state.busy;
+    input.disabled = state.busy || state.loadingImages;
     input.setAttribute("aria-label", `${label} for ${image.name}`);
     input.addEventListener("change", () => {
       image[key] = input.checked;
@@ -195,7 +197,7 @@ function imageRow(image, index) {
   ]) {
     const b = node("button", "icon-button", text);
     b.type = "button";
-    b.disabled = disabled || state.busy;
+    b.disabled = disabled || state.busy || state.loadingImages;
     b.setAttribute("aria-label", `${label}: ${image.name}`);
     b.addEventListener("click", () => {
       action();
@@ -210,7 +212,8 @@ function imageRow(image, index) {
 function renderImages() {
   $("sequence").replaceChildren(...state.images.map(imageRow));
   $("image-count").textContent = `${state.images.length} / 8`;
-  $("clear-images").disabled = state.busy || state.images.length === 0;
+  $("clear-images").disabled =
+    state.busy || state.loadingImages || state.images.length === 0;
   updateEstimate();
   idlePreview();
 }
@@ -253,7 +256,7 @@ async function readImage(blob, name) {
   }
 }
 async function addFiles(files) {
-  if (state.busy) return;
+  if (state.busy || state.loadingImages) return;
   const list = Array.from(files);
   message("");
   if (state.images.length + list.length > 8) {
@@ -261,6 +264,7 @@ async function addFiles(files) {
     return;
   }
   const loaded = [];
+  imageLoading(true);
   try {
     for (const f of list) loaded.push(await readImage(f, f.name));
     if (state.busy) {
@@ -275,6 +279,8 @@ async function addFiles(files) {
   } catch (e) {
     loaded.forEach((i) => URL.revokeObjectURL(i.url));
     message(e.message);
+  } finally {
+    imageLoading(false);
   }
 }
 async function exampleBlob(shape) {
@@ -310,24 +316,75 @@ async function exampleBlob(shape) {
   }
   return new Promise((resolve) => c.toBlob(resolve, "image/png"));
 }
-async function loadExamples() {
-  if (state.busy) return;
-  message("");
+function imageLoading(value) {
+  state.loadingImages = value;
+  document
+    .querySelectorAll(".controls input,.controls select,.controls button")
+    .forEach((el) => {
+      el.disabled = value || state.busy;
+    });
+  $("load-settings").disabled = value || state.busy;
+  $("save-settings").disabled = value || state.busy;
+  $("sequence").setAttribute("aria-busy", String(value));
+  renderImages();
+}
+async function loadExamples(kind = "original", announce = true) {
+  if (state.busy || state.loadingImages) return;
+  message("Loading example…");
+  imageLoading(true);
   const loaded = [];
   try {
-    for (const shape of ["Circle", "Star", "Heart"])
-      loaded.push(await readImage(await exampleBlob(shape), shape));
-    if (state.busy) {
-      loaded.forEach((i) => URL.revokeObjectURL(i.url));
-      return;
+    if (kind === "original") {
+      for (const [file, name] of [
+        ["neuron.png", "Neuron"],
+        ["brain.png", "Brain"],
+        ["person.png", "Person"],
+      ]) {
+        const response = await fetch(
+          `${import.meta.env.BASE_URL}examples/original/${file}`,
+        );
+        if (
+          !response.ok ||
+          !response.headers.get("content-type")?.startsWith("image/png")
+        )
+          throw new Error(
+            "Could not load the original example. Try again or use Simple shapes.",
+          );
+        const image = await readImage(await response.blob(), name);
+        image.invert = image.binary = false;
+        loaded.push(image);
+      }
+    } else {
+      for (const shape of ["Circle", "Star", "Heart"])
+        loaded.push(await readImage(await exampleBlob(shape), shape));
     }
+    // Commit only after every image decodes; a failed load keeps the existing sequence.
     state.images.forEach((i) => URL.revokeObjectURL(i.url));
     state.images = loaded;
+    if (kind === "original") {
+      state.config = { ...DEFAULTS };
+      state.fit = "contain";
+      state.background = "black";
+      state.threshold = 0.5;
+      syncControls();
+    }
     renderImages();
     markDirty();
+    message(
+      announce
+        ? kind === "original"
+          ? "Neuron → brain → person loaded with Original flow settings. Ready to generate."
+          : "Simple shapes loaded. Your animation settings are kept."
+        : "",
+    );
   } catch (e) {
     loaded.forEach((i) => URL.revokeObjectURL(i.url));
-    message(e.message);
+    message(
+      e.message ||
+        "Could not load the example. Try Simple shapes or add your own images.",
+    );
+  } finally {
+    imageLoading(false);
   }
 }
 function syncControls() {
@@ -444,7 +501,7 @@ function download(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 function generate() {
-  if (state.busy) return;
+  if (state.busy || state.loadingImages) return;
   message("");
   stopPlayback();
   try {
@@ -599,7 +656,7 @@ function saveSettings() {
   );
 }
 async function loadSettings(file) {
-  if (!file || state.busy) return;
+  if (!file || state.busy || state.loadingImages) return;
   try {
     if (file.size > 100000)
       throw new Error("Choose an Ising Morph settings file under 100 KB.");
@@ -669,7 +726,7 @@ $("file-input").addEventListener("change", async (e) => {
 for (const event of ["dragenter", "dragover"])
   $("drop-zone").addEventListener(event, (e) => {
     e.preventDefault();
-    if (!state.busy) $("drop-zone").classList.add("is-over");
+    if (!state.busy && !state.loadingImages) $("drop-zone").classList.add("is-over");
   });
 for (const event of ["dragleave", "drop"])
   $("drop-zone").addEventListener(event, (e) => {
@@ -677,7 +734,8 @@ for (const event of ["dragleave", "drop"])
     $("drop-zone").classList.remove("is-over");
   });
 $("drop-zone").addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
-$("examples").addEventListener("click", loadExamples);
+$("examples-original").addEventListener("click", () => loadExamples("original"));
+$("examples-shapes").addEventListener("click", () => loadExamples("shapes"));
 $("motion-preset").addEventListener("change", () => {
   const preset = PRESETS[$("motion-preset").value];
   if (!preset || state.busy) return;
@@ -769,4 +827,4 @@ window.addEventListener("beforeunload", () => {
   if (state.gifUrl) URL.revokeObjectURL(state.gifUrl);
 });
 syncControls();
-loadExamples();
+loadExamples("original", false);

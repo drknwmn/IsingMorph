@@ -1,0 +1,47 @@
+{
+  "app": "Ising Morph",
+  "version": "1.1.0",
+  "config": {
+    "size": 180,
+    "fps": 24,
+    "sweeps": 2,
+    "seed": 7,
+    "strength": 1.8,
+    "hot": 3.5,
+    "formation": 3.125,
+    "hold": 0.375,
+    "dissolve": 0.75,
+    "gap": 1.25,
+    "noise": 1.25,
+    "intro": 1.05,
+    "settle": 1.45,
+    "reheat": 0.95,
+    "mode": "dissolve",
+    "outro": true,
+    "scale": 2,
+    "loop": true
+  },
+  "treatment": {
+    "fit": "contain",
+    "background": "black",
+    "threshold": 0.5
+  },
+  "images": [
+    {
+      "name": "Neuron",
+      "invert": false,
+      "binary": false
+    },
+    {
+      "name": "Brain",
+      "invert": false,
+      "binary": false
+    },
+    {
+      "name": "Person",
+      "invert": false,
+      "binary": false
+    }
+  ],
+  "note": "Use these original project images in the recorded order."
+}

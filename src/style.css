@@ -349,10 +349,34 @@ h1 {
 .icon-button:hover {
   background: #e7e8df;
 }
+.example-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+}
+.example-button {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 5px;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.example-button:hover {
+  background: #e7e8df;
+}
+.image-actions .hint {
+  margin: 0;
+  align-self: center;
+}
 .image-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 3px;
 }
 .text-button {
   display: inline-block;

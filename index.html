@@ -61,10 +61,23 @@
               id="sequence"
               aria-label="Images in playback order"
             ></div>
+            <div
+              class="example-actions"
+              role="group"
+              aria-label="Built-in examples"
+            >
+              <button
+                class="example-button"
+                id="examples-original"
+                title="Load neuron → brain → person and restore Original flow settings"
+              >Original sequence</button>
+              <button class="example-button" id="examples-shapes">
+                Simple shapes
+              </button>
+            </div>
             <div class="image-actions">
-              <button class="text-button" id="examples">
-                Load example shapes</button
-              ><button class="text-button" id="clear-images">Clear</button>
+              <span class="hint">Neuron → brain → person · built in</span>
+              <button class="text-button" id="clear-images">Clear</button>
             </div>
             <p class="hint">
               Use the arrows to reorder. Each image has its own inversion and
@@ -413,7 +426,7 @@
                   >Start with a little curiosity.</strong
                 >
                 <p id="result-description">
-                  The example sequence is ready. Adjust anything, then generate.
+                  Try neuron → brain → person. Adjust anything, then generate.
                 </p>
               </div>
               <div class="export-actions">
